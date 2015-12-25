@@ -34,20 +34,20 @@ class Solution
             }
         }
 
-        public void addChildToNode(String newNum) {
-            if (!(this.containsId(newNum.substring(0, 1)))) {
+        public void addChildToNode(String newNum)
+        {
+            if (!(this.containsId(newNum.substring(0,1))))
+            {
                 this.children.add(new Node(newNum));
             }
 
         }
 
-        public String getId()
-        {
+        public String getId() {
             return id;
         }
 
-        public LinkedList<Node> getChildren()
-        {
+        public LinkedList<Node> getChildren() {
             return children;
         }
 
@@ -62,10 +62,19 @@ class Solution
             }
             return false;
         }
+
+        public String notContainedNumber(String telephone)
+        {
+            while (this.containsId(telephone.substring(1, 0)))
+            {
+
+            }
+            return telephone;
+        }
     }
     public static void main(String args[])
     {
-        System.out.println(getSolution(new Scanner(System.in))); // The number of elements (referencing a number) stored in the structure.
+        System.out.println(new Scanner(System.in)); // The number of elements (referencing a number) stored in the structure.
     }
 
      public static int getSolution(Scanner in)
@@ -74,13 +83,12 @@ class Solution
          int N = in.nextInt();
          for (int i = 0; i < N; i++) {
              String telephone = in.next();
-             if (!(root.containsNumber(telephone)))
-             {
+             String newNumberToAdd = root.notContainedNumber(telephone);
+             if (!(root.containsNumber(telephone))) {
                  root.addChildToNode(telephone);
              }
          }
          return Node.numOfNodes;
      }
-
 }
 
