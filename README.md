@@ -1,3 +1,3 @@
 # CodingGame
 
-This is a repository with programs from codingames.com
+The following are programs of challenges from codingames.com
