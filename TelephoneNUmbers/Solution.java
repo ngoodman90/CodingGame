@@ -7,6 +7,8 @@ import java.util.*;
 import java.io.*;
 import java.math.*;
 
+import static java.lang.System.exit;
+
 class Solution
 {
     private static class Node {
@@ -53,28 +55,51 @@ class Solution
 
         public boolean containsId(String newId)
         {
-            for (Node childNode : this.children)
+            if (this.children != null)
             {
-                if (childNode.getId().equals(newId))
+                for (Node childNode : this.children)
                 {
-                    return true;
+                    if (childNode.getId().equals(newId))
+                    {
+                        return true;
+                    }
                 }
             }
             return false;
         }
 
-        public String notContainedNumber(String telephone)
+        public Node nodeContainsId(String newId)
         {
-            while (this.containsId(telephone.substring(1, 0)))
+            for (Node childNode : this.children)
             {
-
+                if (childNode.getId().equals(newId))
+                {
+                    return childNode;
+                }
             }
-            return telephone;
+            System.out.println("couldnt find child node, even though it was supposed to be found");
+            exit(0);
+            return new Node();
+        }
+
+        public void notContainedNumber(String telephone)
+        {
+            if (telephone.length() > 0)
+            {
+                if (this.containsId(telephone.substring(0, 1)))
+                {
+                    this.nodeContainsId(telephone.substring(0, 1)).notContainedNumber(telephone.substring(1));
+                }
+                else
+                {
+                    this.children.add(new Node(telephone));
+                }
+            }
         }
     }
     public static void main(String args[])
     {
-        System.out.println(new Scanner(System.in)); // The number of elements (referencing a number) stored in the structure.
+        System.out.println(getSolution(new Scanner(System.in))); // The number of elements (referencing a number) stored in the structure.
     }
 
      public static int getSolution(Scanner in)
@@ -83,10 +108,7 @@ class Solution
          int N = in.nextInt();
          for (int i = 0; i < N; i++) {
              String telephone = in.next();
-             String newNumberToAdd = root.notContainedNumber(telephone);
-             if (!(root.containsNumber(telephone))) {
-                 root.addChildToNode(telephone);
-             }
+             root.notContainedNumber(telephone);
          }
          return Node.numOfNodes;
      }
