@@ -9,6 +9,7 @@ import java.math.*;
 class Player {
 
     public static void main(String args[]) {
+
         Scanner in = new Scanner(System.in);
         /*Graph is undirected!*/
         int N = in.nextInt(); // the total number of nodes in the level, including the gateways
@@ -28,44 +29,76 @@ class Player {
         for (int i = 0; i < E; i++) {
             int EI = in.nextInt(); // the index of a gateway node
             System.err.printf("Gateway %d: %d\n", i, EI);
-            nodes.get(EI).setGateway();
+            Node gateway = nodes.get(EI);
+            gateway.setGateway();
+            gateway.getNeighbours().forEach(node->node.incrementGatewayNeighbourNum());
         }
 
         // game loop
         while (true) {
             int SI = in.nextInt(); // The index of the node on which the Skynet agent is positioned this turn
-            Pair bfsAns = bfs(nodes.get(SI));
-            nodes.get(bfsAns.getX()).removeNeighbour(nodes.get(bfsAns.getY()));
-            nodes.get(bfsAns.getY()).removeNeighbour(nodes.get(bfsAns.getX()));
-            nodes.forEach((i, node)->node.setVisited(false));
-            System.out.println(bfsAns.toString());
+            PriorityQueue<Node> queue = new PriorityQueue<>(N, (x,y) -> x.getDistance() - y.getDistance());
+            Pair ans;
+            Node x, y;
+            nodes.get(SI).setDistance(0);
+            nodes.forEach((num, node) -> queue.add(node));
+
+            ans = djikstra(queue);
+            x = nodes.get(ans.getX());
+            y = nodes.get(ans.getY());
+            System.err.println("X: " + x.toString());
+            System.err.println("Y: " + y.toString());
+            x.removeNeighbour(y);
+            y.removeNeighbour(x);
+            x.decrementGatewayNeighbourNum();
+            nodes.forEach((i, node)->{
+                node.setVisited(false);
+                node.setDistance(Integer.MAX_VALUE);
+            });
+            System.out.println(ans.toString());
         }
     }
 
-    public static Pair bfs(Node src)
+    public static Pair djikstra(PriorityQueue<Node> queue)
     {
-        // BFS uses Queue data structure
-        Queue<Node> queue = new LinkedList<>();
-        queue.add(src);
-        src.setVisited(true);
+        Pair ans = new Pair(-1, -1);
+        int currentLinkPriority;
+        int priorityLink = Integer.MAX_VALUE;
         while(!queue.isEmpty())
         {
             Node curr = queue.remove();
+            System.err.println("Distance: " + curr.getDistance());
+            curr.setVisited(true);
             for (Node child : curr.getNeighbours())
             {
                 if (!child.isVisited())
                 {
-                    child.setVisited(true);
-                    child.setDistance(curr.getDistance() + 1);
+                    queue.remove(child);
+                    if (curr.getNumOfGatewayNeighbours() > 0)
+                        child.setDistance(curr.getDistance() < child.getDistance() ?
+                                curr.getDistance() : child.getDistance());
+                    else
+                        child.setDistance(curr.getDistance() + 1 < child.getDistance() ?
+                                curr.getDistance() + 1 : child.getDistance());
+
+                    if (child.isGateway())
+                    {
+                        currentLinkPriority = child.getDistance() - curr.getNumOfGatewayNeighbours();
+
+                        if (currentLinkPriority < 0)
+                            return new Pair(curr.getVal(), child.getVal());
+
+                        if (currentLinkPriority < priorityLink)
+                        {
+                            priorityLink = currentLinkPriority;
+                            ans = new Pair(curr.getVal(), child.getVal());
+                        }
+                    }
                     queue.add(child);
                 }
-                if (child.isGateway())
-                    child.getNeighbours().forEach(node->node.incrementGatewayNeighbourNum());
-
-                    return new Pair(child.getVal(), curr.getVal());
             }
         }
-        return new Pair(-1, -1);
+        return ans;
     }
 
     static class Pair
@@ -99,10 +132,12 @@ class Player {
         {
             this.val = val;
             this.visited = false;
-            this.distance = 0;
+            this.distance = Integer.MAX_VALUE;
             this.numOfGatewayNeighbours = 0;
             this.neighbours = new LinkedList<>();
         }
+
+        public int getVal(){return this.val;}
 
         public int getDistance(){return distance;}
 
@@ -110,9 +145,9 @@ class Player {
 
         public int getNumOfGatewayNeighbours() {return numOfGatewayNeighbours;}
 
-        public void setNumOfGatewayNeighbours(int numOfGatewayNeighbours) {this.numOfGatewayNeighbours = numOfGatewayNeighbours;}
+        public void incrementGatewayNeighbourNum() {this.numOfGatewayNeighbours++;}
 
-        public int getVal(){return this.val;}
+        public void decrementGatewayNeighbourNum() {this.numOfGatewayNeighbours--;}
 
         public LinkedList<Node> getNeighbours(){return this.neighbours;}
 
@@ -128,6 +163,14 @@ class Player {
 
         public void removeNeighbour(Node neighbour){this.neighbours.remove(neighbour);}
 
-        public void incrementGatewayNeighbourNum() {this.numOfGatewayNeighbours++;}
+        public String toString()
+        {
+            if (this.isGateway)
+                return "Val: " + this.val + " Distance: " + this.distance 
+                    + " Num of neighbours: " + this.neighbours.size();
+            else
+                return "Val: " + this.val + " Distance: " + this.distance 
+                    + " Gateway neighbours: " + this.numOfGatewayNeighbours; 
+        }
     }
 }
