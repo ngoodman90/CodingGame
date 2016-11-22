@@ -1,12 +1,6 @@
-package com.horse;
-
-/**
- * Created by ngoodman90 on 12/9/2015.
- */
 import java.util.*;
 import java.io.*;
 import java.math.*;
-
 
 /**
  * Auto-generated code below aims at helping you parse
