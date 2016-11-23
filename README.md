@@ -1,3 +1,3 @@
 # CodingGame
 
-The following are programs of challenges from codingames.com
+The following are programs of challenges from https://www.codingame.com
