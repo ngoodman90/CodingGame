@@ -19,13 +19,16 @@ class Player {
         Scanner in = new Scanner(System.in);
         int myTeamId = in.nextInt(); // if 0 you need to score on the right of the map, if 1 you need to score on the left
         Point goal = (myTeamId == 0 ? new Player.Point(16000, 3750) : new Player.Point(0, 3750));
-        Wizard wizard1 = null;
-        Wizard wizard2 = null;
+        Wizard[] wizards;
         ArrayList<Snaffle> snaffles;
+        Bludger bludger1 = null;
+        Bludger bludger2 = null;
+        
 
         // game loop
         while (true) {
-            snaffles = new ArrayList<>();
+            snaffles = new ArrayList<>(7);
+            wizards = new Wizard[4];
             int entities = in.nextInt(); // number of entities still in game
             for (int i = 0; i < entities; i++) {
                 int entityId = in.nextInt(); // entity identifier
@@ -38,20 +41,34 @@ class Player {
                 switch (entityType)
                 {
                     case ("WIZARD"):
-                        if (wizard1 == null)
-                            wizard1 = new Wizard(entityId, new Point(x, y), new Point(vx, vy), state);
+                        if (wizards[0] == null)
+                            wizards[0] = new Wizard(entityId, new Point(x, y), new Point(vx, vy), state);
                         else
-                            wizard2 = new Wizard(entityId, new Point(x, y), new Point(vx, vy), state);
+                            wizards[1] = new Wizard(entityId, new Point(x, y), new Point(vx, vy), state);
+                        break;
+
+                    case ("OPPONENT_WIZARD"):
+                        if (wizards[2] == null)
+                            wizards[2] = new Wizard(entityId, new Point(x, y), new Point(vx, vy), state);
+                        else
+                            wizards[3] = new Wizard(entityId, new Point(x, y), new Point(vx, vy), state);
+                        break;
+
+                    case ("BLUDGER"):
+                        if (bludger1 == null)
+                            bludger1 = new Bludger(entityId, new Point(x, y), new Point(vx, vy));
+                        else
+                            bludger2 = new Bludger(entityId, new Point(x, y), new Point(vx, vy));
                         break;
 
                     case ("SNAFFLE"):
                         snaffles.add(new Snaffle(entityId, new Point(x, y), new Point(vx, vy)));
-                        break;
+                        break;    
                 }           
             }
-            System.out.println(wizard1.outputString(snaffles, goal));
-            System.out.println(wizard2.outputString(snaffles, goal));
-            wizard1 = wizard2 = null;
+            System.out.println(wizards[0].outputString(snaffles, goal));
+            System.out.println(wizards[1].outputString(snaffles, goal));
+            bludger1 = bludger2 = null;
         }
     }
 
@@ -138,11 +155,13 @@ class Player {
                 int power = (distanceToSnaffle > 150 ? 150 : (int)distanceToSnaffle);
                 output = "MOVE" + " " + goTo.toString() + " " + power;
             }
-            else
+            else//wizard has a snaffle
             {
                 double distanceToGoal = this.getPosition().distanceToPoint(goal);
                 int power = (distanceToGoal > 500 ? 500 : (int) distanceToGoal);
-                output = "THROW" + " " + goal.toString() + " " + power;
+                int y = this.getPosition().getY();
+                int yGoalLine = (y > 5450 ? 5450 : (y > 2050 ? y : 2050));
+                output = "THROW" + " " + goal.getX() + " " + yGoalLine + " " + power;
             }
             return output;
         }
@@ -154,5 +173,13 @@ class Player {
         {
             super(id, p, v);
         }        
+    }
+
+    public class Bludger extends Entity
+    {
+        public Bludger(int id, Point p, Point v)
+        {
+            super(id, p, v);
+        }   
     }
 }
