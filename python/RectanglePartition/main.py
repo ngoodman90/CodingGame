@@ -3,15 +3,17 @@ https://www.codingame.com/training/easy/rectangle-partition
 """
 
 
+def get_deltas(int_list):
+    deltas = []
+    for i in range(len(int_list)):
+        for j in range(i):
+            deltas.append(int_list[i] - int_list[j])
+    return deltas
+
+
 def get_num_of_squares(x_split, y_split):
-    dx = []
-    dy = []
-    for i in range(len(x_split)):
-        for j in range(i):
-            dx.append(x_split[i] - x_split[j])
-    for i in range(len(y_split)):
-        for j in range(i):
-            dy.append(y_split[i] - y_split[j])
+    dx = get_deltas(x_split)
+    dy = get_deltas(y_split)
 
     return sum(dy.count(d) for d in dx)
 
