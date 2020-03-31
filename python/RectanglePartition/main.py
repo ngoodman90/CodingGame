@@ -1,3 +1,8 @@
+"""
+https://www.codingame.com/training/easy/rectangle-partition
+"""
+
+
 def get_num_of_squares(x_split, y_split):
     dx = []
     dy = []
