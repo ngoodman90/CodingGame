@@ -19,7 +19,7 @@ def tsp(points: List[Tuple[int, int]]) -> float:
 
 
 def main():
-    points = [tuple([int(j) for j in input().split()]) for _ in range(int(input()))]
+    points = [tuple(map(int,  input().split())) for _ in range(int(input()))]
     print(round(tsp(points)))
 
 
