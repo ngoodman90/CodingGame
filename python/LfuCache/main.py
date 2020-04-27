@@ -1,3 +1,4 @@
+# https://leetcode.com/problems/lfu-cache/
 from collections import OrderedDict, defaultdict
 
 
@@ -51,7 +52,9 @@ class LFUCache:
             self.set(key, value)
             return
         if self.cache_size > 0 and self.cache_size == self.capacity:
-            min_calls = min(self.num_of_calls.values())
+            min_calls = 1
+            while self.caches.get(min_calls) is None:
+                min_calls += 1
             deleted_key = self.caches[min_calls].delete_last()
             del self.num_of_calls[deleted_key]
             self.cache_size -= 1
