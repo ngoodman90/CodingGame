@@ -8,6 +8,9 @@ def network_delay_time(times: List[List[int]], n: int, k: int) -> int:
     edges = defaultdict(list)
     for t in times:
         edges[t[0]].append((t[1], t[2]))
+    for k, v in edges.items():
+        edges[k] = sorted(v, key=lambda x: x[1])
+
     queue = [k]
     while queue:
         node = queue.pop(0)
